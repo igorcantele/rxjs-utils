@@ -18,15 +18,16 @@ export function prepare<T>(
 }
 
 /**
- * Get loading status, one-liner that will automatically update your loading counter when the observable is making.
+ * Indicates whether the observable is currently loading (meaning subscription is active and
+ * it hasn't completed or errored).
  *
- * NOTE: it has to be used observables that finishes when subscribed (e.g. inner http requests, form actions...)
+ * @param indicator subject as target for indication
+ * @returns stream which will indicate loading through passed subject
  *
- * Usage example:
+ * @example
  * ```ts
- * loadingCount$ = new Subject<number>()
- * myObservable$.pipe(isLoading(loadingCount$)).subscribe()
- * myObservable2$.pipe(isLoading(loadingCount$)).subscribe()
+ * isLoading$ = new Subject<boolean>()
+ * myObservable$.pipe(isLoading(isLoading$)).subscribe()
  * ```
  */
 export function isLoading<T>(
@@ -40,21 +41,23 @@ export function isLoading<T>(
 }
 
 /**
- * Get loading status before the first emission;
- * one-liner that will automatically update your loading indicator to true when the first value is emitted.
+ * Return an observable that indicates whether the observable has emitted at least once or has errored.
  *
- * Usage example:
+ * @param obs observable target for indication
+ * @param filterFn function to filter eligible observable values to stop loading
+ * @returns observable which will indicate loading state
+ *
+ * @example
  * ```ts
  * hasLoaded$ = beforeLoad<boolean>(myObservable$)
  * ```
  */
-export function beforeLoad(obs: Observable<any>): Observable<boolean> {
-  const isFilled = (elem: any) =>
-    !!elem &&
-    (!Array.isArray(elem) || !!elem.length) &&
-    (typeof elem !== "object" || !!Object.keys(elem).length);
+export function beforeLoad<T>(
+  obs: Observable<T>,
+  filterFn: (value: T) => boolean = () => true
+): Observable<boolean> {
   return obs.pipe(
-    first(elem => isFilled(elem)),
+    first(elem => filterFn(elem)),
     map(() => false),
     startWith(true),
     catchError(() => of(false))
