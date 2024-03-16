@@ -1,0 +1,30 @@
+{
+  "name": "rxjs-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start --single-run",
+    "test:watch": "karma start",
+    "test:ci": "karma start --single-run --code-coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/igorcantele/rxjs-utils.git"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.5"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^5.1.4",
+    "jasmine-core": "~5.1.0",
+    "karma": "^6.4.3",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-coverage": "^2.2.1",
+    "karma-jasmine": "^5.1.0",
+    "karma-typescript": "^5.5.4",
+    "prettier": "2.2.1",
+    "typescript": "~4.9.5"
+  },
+  "private": true
+}
