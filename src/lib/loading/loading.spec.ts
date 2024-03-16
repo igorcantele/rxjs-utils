@@ -1,4 +1,4 @@
-import {of, Subject, throwError} from "rxjs";
+import {of, Subject, Subscription, throwError} from "rxjs";
 import {beforeLoad, isLoading, prepare} from "./loading";
 import {bufferCount, switchMap} from "rxjs/operators";
 import createSpy = jasmine.createSpy;
@@ -21,22 +21,27 @@ describe("prepare", () => {
 describe("isLoading", () => {
     let indicator: SpyObj<Subject<boolean>>;
     let sink: Subject<string>;
+    const subscriptions: Subscription[] = []
 
     beforeEach(() => {
         indicator = createSpyObj("subject", ["next"]);
         sink = new Subject<string>();
     });
+    afterEach(() => {
+        subscriptions.forEach(sub => sub.unsubscribe());
+    });
 
     it("should switch indication based on subscription and completion", () => {
         const observable = sink.pipe(isLoading(indicator));
         expect(indicator.next).not.toHaveBeenCalled();
-        observable.subscribe(value => {
+        const subcription = observable.subscribe(value => {
             expect(value).toEqual("test");
         }, fail);
         expect(indicator.next.calls.mostRecent().args).toEqual([true]);
         sink.next("test");
         sink.complete();
         expect(indicator.next.calls.mostRecent().args).toEqual([false]);
+        subscriptions.push(subcription);
     });
 
     it("should switch indication based on the observable erroring out", () => {
@@ -45,7 +50,7 @@ describe("isLoading", () => {
             isLoading(indicator)
         );
         expect(indicator.next).not.toHaveBeenCalled();
-        observable.subscribe({
+        const subcription = observable.subscribe({
             next: fail,
             error: error => {
                 expect(error.message).toEqual("EXPECTED_ERROR");
@@ -54,10 +59,17 @@ describe("isLoading", () => {
         expect(indicator.next.calls.mostRecent().args).toEqual([true]);
         sink.next("test");
         expect(indicator.next.calls.mostRecent().args).toEqual([false]);
+        subscriptions.push(subcription);
     });
 });
 
 describe("beforeLoad", () => {
+    const subscriptions: Subscription[] = []
+
+    afterEach(() => {
+        subscriptions.forEach(sub => sub.unsubscribe());
+    });
+
     it("should switch indication based on subscription", () => {
         const eventEmitter = new Subject<number>
         const targetObservable = eventEmitter.asObservable();
@@ -65,7 +77,7 @@ describe("beforeLoad", () => {
 
         let expectedValue = true
 
-        beforeLoad$.subscribe({
+        const subcription = beforeLoad$.subscribe({
             next: value => {
                 expect(value).toEqual(expectedValue)
             },
@@ -75,6 +87,7 @@ describe("beforeLoad", () => {
         expectedValue = false;
         eventEmitter.next(1);
         eventEmitter.next(1);
+        subscriptions.push(subcription);
     });
 
     it("should switch indication based on subscription and the given filter function", () => {
@@ -84,7 +97,7 @@ describe("beforeLoad", () => {
 
         let expectedValue = true
 
-        beforeLoad$.subscribe({
+        const subcription = beforeLoad$.subscribe({
             next: value => {
                 expect(value).toEqual(expectedValue)
             },
@@ -95,16 +108,19 @@ describe("beforeLoad", () => {
         expectedValue = false;
         eventEmitter.next(2);
         eventEmitter.next(1);
+        subscriptions.push(subcription);
     });
 
-    it("should switch indication based on the observable erroring out", () => {
+    it("should switch indication based on the observable erroring out", done => {
         const beforeLoad$ = beforeLoad(throwError(new Error("EXPECTED_ERROR")));
-        beforeLoad$.pipe(bufferCount(2)).subscribe({
+        const subcription = beforeLoad$.pipe(bufferCount(2)).subscribe({
             next: value => {
                 expect(value).toEqual([true, false])
+                done()
             },
             error: fail
         })
 
+        subscriptions.push(subcription);
     });
 });
