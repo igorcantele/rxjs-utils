@@ -1,15 +1,6 @@
 import { CascadeStrategies } from "./cascade-strategies";
 import { of, Subscription } from "rxjs";
 
-const ciao = {
-  ciao: (arg1: number, arg2: string) => of(arg1),
-  domani: (arg1: number, arg2: string) => of(arg2)
-};
-
-const strat = new CascadeStrategies(ciao);
-
-const res = strat.use(["ciao"], 1, "f");
-
 describe("CascadeStrategies", () => {
   const subscriptions: Subscription[] = [];
 
