@@ -28,10 +28,5 @@
     },
     "removeComments": false,
     "useDefineForClassFields": false
-  },
-  "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true,
-    "annotateForClosureCompiler": false
   }
 }
