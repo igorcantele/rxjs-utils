@@ -47,7 +47,7 @@ export class CascadeStrategies<
    *
    * */
   use<K extends keyof T>(strategies: K[], ...args: A): Observable<T[K]> {
-    if (!strategies.length) return throwError(new Error("STRATEGY_FAILED"));
+    if (!strategies.length) return throwError(new Error("ALL_STRATEGIES_FAILED"));
     return this.strategies[strategies[0]](...args).pipe(
       catchError(() => {
         const remainingStrategies = strategies.slice(1);
