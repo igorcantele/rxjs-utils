@@ -1,4 +1,4 @@
-import { CascadeStrategies } from "./cascade-strategies";
+import {ALL_STRATEGIES_FAILED, CascadeStrategies} from "./cascade-strategies";
 import {of, Subscription, throwError} from "rxjs";
 
 describe("CascadeStrategies", () => {
@@ -99,23 +99,23 @@ describe("CascadeStrategies", () => {
     const test1Subscription = test1Observable.subscribe(fail, error => {
       expect(strategyMap.test1).toHaveBeenCalled();
       expect(strategyMap.test2).toHaveBeenCalled();
-      expect(error.message).toEqual("ALL_STRATEGIES_FAILED");
+      expect(error.message).toEqual(ALL_STRATEGIES_FAILED);
     });
     subscriptions.push(test1Subscription);
     const test2Subscription = test2Observable.subscribe(fail, error => {
       expect(strategyMap.test3).toHaveBeenCalled();
       expect(strategyMap.test4).toHaveBeenCalled();
       expect(strategyMap.test5).toHaveBeenCalled();
-      expect(error.message).toEqual("ALL_STRATEGIES_FAILED");
+      expect(error.message).toEqual(ALL_STRATEGIES_FAILED);
     });
     subscriptions.push(test2Subscription);
     const test3Subscription = test3Observable.subscribe(fail, error => {
       expect(strategyMap.test6).toHaveBeenCalled();
-      expect(error.message).toEqual("ALL_STRATEGIES_FAILED");
+      expect(error.message).toEqual(ALL_STRATEGIES_FAILED);
     });
     subscriptions.push(test3Subscription);
     const test4Subscription = test4Observable.subscribe(fail, error => {
-      expect(error.message).toEqual("ALL_STRATEGIES_FAILED");
+      expect(error.message).toEqual(ALL_STRATEGIES_FAILED);
     });
     subscriptions.push(test4Subscription);
   });
